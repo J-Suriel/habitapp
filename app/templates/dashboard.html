@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Habit Tracker</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+  </head>
+  <body>
+    {% extends "base.html" %} {% block content %}
+
+    <h2>{{ user.username }}'s Dashboard</h2>
+    <p>Coins: {{ user.currency }} 🪙 | XP: {{ user.xp }} ⭐</p>
+
+    <p>
+      <a href="{{ url_for('main.habits') }}">Manage Habits</a> |
+      <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </p>
+
+    <hr />
+
+    {% if habit_data|length == 0 %}
+    <p>No habits yet. Add one!</p>
+    {% else %} {% for item in habit_data %}
+    <div style="margin-bottom: 14px">
+      <strong>{{ item.habit.name }}</strong>
+      <p>{{ item.habit.description }}</p>
+
+      <p>Streak: {{ item.streak }} 🔥</p>
+
+      {% if item.completed_today %}
+      <em>Completed today ✅</em>
+      {% else %}
+      <form
+        method="POST"
+        action="{{ url_for('main.complete_habit', habit_id=item.habit.id) }}"
+      >
+        <button type="submit">Mark Complete Today</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %} {% endif %} {% endblock %}
+  </body>
+</html>
