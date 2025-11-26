@@ -1,45 +1,94 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Habit Tracker</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/main.css') }}"
-    />
-  </head>
-  <body>
-    {% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% block content %}
 
-    <h2>{{ user.username }}'s Dashboard</h2>
-    <p>Coins: {{ user.currency }} 🪙 | XP: {{ user.xp }} ⭐</p>
+<div class="page-header">
+  <h2>{{ user.username }}'s Dashboard</h2>
+  <p>
+    Level {{ xp_info.level }} • {{ user.xp }} XP • {{ user.currency }} 🪙 coins
+  </p>
 
-    <p>
-      <a href="{{ url_for('main.habits') }}">Manage Habits</a> |
-      <a href="{{ url_for('auth.logout') }}">Logout</a>
-    </p>
+  <div class="progress-bar">
+    <div
+      class="progress-bar-fill"
+      data-percent="{{ xp_info['percent'] }}"
+    ></div>
+  </div>
 
-    <hr />
+  <p class="progress-text">
+    {{ xp_info.current_xp }} / {{ xp_info.needed_xp }} XP to next level
+  </p>
+</div>
+
+<div class="page-actions">
+  <a class="btn" href="{{ url_for('main.habits') }}">Manage Habits</a>
+  <a class="btn" href="{{ url_for('shop.shop_home') }}">Shop</a>
+</div>
+
+<div class="layout-grid">
+  <div class="card">
+    <h3>Today's Habits</h3>
 
     {% if habit_data|length == 0 %}
     <p>No habits yet. Add one!</p>
     {% else %} {% for item in habit_data %}
-    <div style="margin-bottom: 14px">
-      <strong>{{ item.habit.name }}</strong>
-      <p>{{ item.habit.description }}</p>
+    <div class="habit-item">
+      <div>
+        <strong>{{ item.habit.name }}</strong>
+        <p class="muted">{{ item.habit.description }}</p>
+        <p>Streak: {{ item.streak }} 🔥</p>
+      </div>
 
-      <p>Streak: {{ item.streak }} 🔥</p>
-
-      {% if item.completed_today %}
-      <em>Completed today ✅</em>
-      {% else %}
-      <form
-        method="POST"
-        action="{{ url_for('main.complete_habit', habit_id=item.habit.id) }}"
-      >
-        <button type="submit">Mark Complete Today</button>
-      </form>
-      {% endif %}
+      <div class="habit-actions">
+        {% if item.completed_today %}
+        <span class="badge badge-success">Completed ✅</span>
+        <form
+          method="POST"
+          action="{{ url_for('main.uncomplete_habit', habit_id=item.habit.id) }}"
+        >
+          <button type="submit" class="btn btn-outline">Undo</button>
+        </form>
+        {% else %}
+        <form
+          method="POST"
+          action="{{ url_for('main.complete_habit', habit_id=item.habit.id) }}"
+        >
+          <button type="submit" class="btn btn-primary">Mark Complete</button>
+        </form>
+        {% endif %}
+      </div>
     </div>
-    {% endfor %} {% endif %} {% endblock %}
-  </body>
-</html>
+    {% endfor %} {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>Habit Analytics (Last 7 Days)</h3>
+
+    {% if analytics|length == 0 %}
+    <p>No data yet. Complete some habits to see stats.</p>
+    {% else %}
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>Habit</th>
+          <th>Streak</th>
+          <th>7-Day Completions</th>
+          <th>7-Day %</th>
+          <th>Total Completions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in analytics %}
+        <tr>
+          <td>{{ row.habit.name }}</td>
+          <td>{{ row.streak }}</td>
+          <td>{{ row.completed_last_7 }}</td>
+          <td>{{ row.completion_rate_7 }}%</td>
+          <td>{{ row.total_completions }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

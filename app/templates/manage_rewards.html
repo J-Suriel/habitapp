@@ -1,0 +1,57 @@
+{% extends "base.html" %} {% block content %}
+<div class="page-header">
+  <h2>Manage Rewards</h2>
+</div>
+
+<div class="page-actions">
+  <a class="btn" href="{{ url_for('shop.shop_home') }}">Back to Shop</a>
+</div>
+
+<div class="card">
+  <h3>Create New Reward</h3>
+  <form method="POST" class="form-grid">
+    <input name="name" placeholder="Reward name" required />
+    <input
+      name="cost"
+      type="number"
+      min="1"
+      placeholder="Cost (coins)"
+      required
+    />
+    <input name="description" placeholder="Short description" />
+    <button type="submit" class="btn btn-primary">Add Reward</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Existing Rewards</h3>
+  {% if rewards|length == 0 %}
+  <p>No rewards yet.</p>
+  {% else %}
+  <ul class="list-vertical">
+    {% for r in rewards %}
+    <li class="list-item">
+      <div>
+        <strong>{{ r.name }}</strong>
+        <p class="muted">{{ r.description }}</p>
+        <p>Cost: {{ r.cost }} coins</p>
+      </div>
+      <div class="horizontal-actions">
+        <a
+          class="btn btn-outline"
+          href="{{ url_for('shop.edit_reward', reward_id=r.id) }}"
+          >Edit</a
+        >
+        <form
+          method="POST"
+          action="{{ url_for('shop.delete_reward', reward_id=r.id) }}"
+        >
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endblock %}

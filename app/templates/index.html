@@ -1,11 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Habit Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-</head>
-<body>
-    <h1>Welcome to the Habit Tracker!</h1>
-    <a href="/login">Login</a> | <a href="/register">Register</a>
-</body>
-</html>
+{% extends "base.html" %} {% block content %}
+<div class="page-header">
+  <h1>Welcome to the Habit Tracker - Jacob S</h1>
+  <p>Build better habits, earn coins, and trade them for real-world rewards.</p>
+</div>
+
+<div class="card">
+  <h3>Get Started</h3>
+  <p>
+    Create an account or log in to start tracking your habits and collecting
+    rewards.
+  </p>
+  <div class="page-actions">
+    <a class="btn btn-primary" href="{{ url_for('auth.register') }}"
+      >Create Account</a
+    >
+    <a class="btn btn-outline" href="{{ url_for('auth.login') }}">Login</a>
+  </div>
+</div>
+{% endblock %}

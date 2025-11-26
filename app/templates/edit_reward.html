@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% block content %}
+<div class="page-header">
+  <h2>Edit Reward</h2>
+</div>
+
+<div class="card">
+  <form method="POST" class="form-grid">
+    <input name="name" value="{{ reward.name }}" required />
+    <input
+      name="cost"
+      type="number"
+      min="1"
+      value="{{ reward.cost }}"
+      required
+    />
+    <input name="description" value="{{ reward.description }}" />
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </form>
+</div>
+
+<div class="page-actions">
+  <a class="btn" href="{{ url_for('shop.manage_rewards') }}">Back</a>
+</div>
+{% endblock %}
