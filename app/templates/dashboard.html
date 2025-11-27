@@ -11,19 +11,30 @@
       class="progress-bar-fill"
       data-percent="{{ xp_info['percent'] }}"
     ></div>
+    <p class="progress-text">
+      {{ xp_info['current_xp'] }} / {{ xp_info['needed_xp'] }} XP to next level
+    </p>
   </div>
 
-  <p class="progress-text">
-    {{ xp_info.current_xp }} / {{ xp_info.needed_xp }} XP to next level
-  </p>
-</div>
+  <div class="card" style="margin-top: 16px">
+    <h3>Today's Habit Completion</h3>
+    <div class="progress-bar">
+      <div
+        class="progress-bar-fill"
+        data-percent="{{ daily_info['percent'] }}"
+      ></div>
+    </div>
+    <p class="progress-text">
+      {{ daily_info['completed'] }} / {{ daily_info['total'] }} habits completed
+      today
+    </p>
+  </div>
 
-<div class="page-actions">
-  <a class="btn" href="{{ url_for('main.habits') }}">Manage Habits</a>
-  <a class="btn" href="{{ url_for('shop.shop_home') }}">Shop</a>
-</div>
+  <div class="page-actions">
+    <a class="btn" href="{{ url_for('main.habits') }}">Manage Habits</a>
+    <a class="btn" href="{{ url_for('shop.shop_home') }}">Shop</a>
+  </div>
 
-<div class="layout-grid">
   <div class="card">
     <h3>Today's Habits</h3>
 
@@ -40,12 +51,6 @@
       <div class="habit-actions">
         {% if item.completed_today %}
         <span class="badge badge-success">Completed ✅</span>
-        <form
-          method="POST"
-          action="{{ url_for('main.uncomplete_habit', habit_id=item.habit.id) }}"
-        >
-          <button type="submit" class="btn btn-outline">Undo</button>
-        </form>
         {% else %}
         <form
           method="POST"
@@ -90,5 +95,4 @@
     {% endif %}
   </div>
 </div>
-
 {% endblock %}

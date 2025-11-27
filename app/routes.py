@@ -24,23 +24,28 @@ def dashboard():
     habit_data = []
     analytics = []
     today = date.today()
-    week_ago = today - timedelta(days=6)  # last 7 days inclusive
+    week_ago = today - timedelta(days=6)
+
+    completed_today_count = 0
 
     for h in habits:
         today_prog = HabitProgress.query.filter_by(
             habit_id=h.id, day=today
         ).first()
         completed_today = bool(today_prog and today_prog.completed)
+        if completed_today:
+            completed_today_count += 1
+
         streak = calculate_streak(h)
 
-        # 7-day completion analytics
+        # 7-day stats
         last_week_progs = HabitProgress.query.filter(
             HabitProgress.habit_id == h.id,
             HabitProgress.day >= week_ago,
             HabitProgress.day <= today,
         ).all()
         completed_count = sum(1 for p in last_week_progs if p.completed)
-        completion_rate = int((completed_count / 7) * 100)  # percent
+        completion_rate = int((completed_count / 7) * 100)
 
         total_completions = HabitProgress.query.filter_by(
             habit_id=h.id, completed=True
@@ -62,13 +67,27 @@ def dashboard():
 
     xp_info = get_xp_progress(current_user.xp)
 
+    total_habits = len(habits)
+    if total_habits > 0:
+        daily_percent = int((completed_today_count / total_habits) * 100)
+    else:
+        daily_percent = 0
+
+    daily_info = {
+        "completed": completed_today_count,
+        "total": total_habits,
+        "percent": daily_percent,
+    }
+
     return render_template(
         "dashboard.html",
         habit_data=habit_data,
         analytics=analytics,
         xp_info=xp_info,
+        daily_info=daily_info,
         user=current_user,
     )
+
 
 # ---------- Habits CRUD ----------
 
@@ -135,38 +154,29 @@ def complete_habit(habit_id):
         habit_id=habit.id, day=today
     ).first()
 
+    newly_completed = False
+
     if not prog:
+        # no record for today yet → create and mark complete
         prog = HabitProgress(habit_id=habit.id, day=today, completed=True)
         db.session.add(prog)
-    else:
+        newly_completed = True
+    elif not prog.completed:
+        # record exists for today but not completed yet
         prog.completed = True
+        newly_completed = True
+    else:
+        # already completed today → do nothing (no extra rewards)
+        newly_completed = False
 
     db.session.commit()
 
-    # reward
-    streak = calculate_streak(habit)
-    coins = reward_for_completion(streak)
-    current_user.currency += coins
-    current_user.xp += 10
-    db.session.commit()
-
-    return redirect(url_for("main.dashboard"))
-
-@main.route("/habits/<int:habit_id>/uncomplete", methods=["POST"])
-@login_required
-def uncomplete_habit(habit_id):
-    habit = Habit.query.get_or_404(habit_id)
-
-    if habit.user_id != current_user.id:
-        return redirect(url_for("main.dashboard"))
-
-    today = date.today()
-    prog = HabitProgress.query.filter_by(
-        habit_id=habit.id, day=today
-    ).first()
-
-    if prog:
-        prog.completed = False
+    if newly_completed:
+        # reward only the first time a habit is completed on a given day
+        streak = calculate_streak(habit)
+        coins = reward_for_completion(streak)
+        current_user.currency += coins
+        current_user.xp += 10
         db.session.commit()
 
     return redirect(url_for("main.dashboard"))

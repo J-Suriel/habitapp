@@ -1,19 +1,22 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Habit Tracker</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/main.css') }}"
-    />
-  </head>
-  <body>
-    <form method="POST">
-      <input name="username" placeholder="Username" required />
-      <input name="password" type="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
+{% extends "base.html" %}
+{% block content %}
 
-    <p>No account yet? <a href="{{ url_for('auth.register') }}">Register</a></p>
-  </body>
-</html>
+<div class="page-header">
+  <h2>Login</h2>
+  <p class="muted">Welcome back! Log in to continue your streaks and rewards.</p>
+</div>
+
+<div class="card">
+  <form method="POST" class="form-grid">
+    <input name="username" placeholder="Username" required>
+    <input name="password" type="password" placeholder="Password" required>
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+
+  <p class="muted" style="margin-top: 10px;">
+    Don't have an account?
+    <a href="{{ url_for('auth.register') }}">Create one here</a>.
+  </p>
+</div>
+
+{% endblock %}

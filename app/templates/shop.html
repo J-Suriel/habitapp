@@ -1,5 +1,4 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
 <div class="page-header">
   <h2>Reward Shop</h2>
@@ -16,28 +15,31 @@
     <h3>Available Rewards</h3>
 
     {% if rewards|length == 0 %}
-      <p>No rewards available.</p>
+    <p>No rewards available.</p>
     {% else %}
-      <ul class="list-vertical">
-        {% for r in rewards %}
-          <li class="list-item">
-            <div>
-              <strong>{{ r.name }}</strong>
-              <p class="muted">{{ r.description }}</p>
-              <p>Cost: {{ r.cost }} coins</p>
-            </div>
-            <div>
-              {% if user.currency >= r.cost %}
-                <form method="POST" action="{{ url_for('shop.redeem_reward', reward_id=r.id) }}">
-                  <button type="submit" class="btn btn-primary">Redeem</button>
-                </form>
-              {% else %}
-                <button class="btn btn-disabled" disabled>Not enough coins</button>
-              {% endif %}
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
+    <ul class="list-vertical">
+      {% for r in rewards %}
+      <li class="list-item">
+        <div>
+          <strong>{{ r.name }}</strong>
+          <p class="muted">{{ r.description }}</p>
+          <p>Cost: {{ r.cost }} coins</p>
+        </div>
+        <div>
+          {% if user.currency >= r.cost %}
+          <form
+            method="POST"
+            action="{{ url_for('shop.redeem_reward', reward_id=r.id) }}"
+          >
+            <button type="submit" class="btn btn-primary">Redeem</button>
+          </form>
+          {% else %}
+          <button class="btn btn-disabled" disabled>Not enough coins</button>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
     {% endif %}
   </div>
 
@@ -45,18 +47,18 @@
     <h3>Redemption History</h3>
 
     {% if history|length == 0 %}
-      <p>No redemptions yet.</p>
+    <p>No redemptions yet.</p>
     {% else %}
-      <ul class="list-vertical">
-        {% for item in history %}
-          <li class="list-item">
-            <strong>{{ item.reward.name }}</strong>
-            <span class="muted">
-              — {{ item.redeemed_at.strftime("%Y-%m-%d %H:%M") }}
-            </span>
-          </li>
-        {% endfor %}
-      </ul>
+    <ul class="list-vertical">
+      {% for item in history %}
+      <li class="list-item">
+        <strong>{{ item.reward.name }}</strong>
+        <span class="muted">
+          — {{ item.redeemed_at.strftime("%Y-%m-%d %H:%M") }}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
     {% endif %}
   </div>
 </div>
